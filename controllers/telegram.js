@@ -251,15 +251,18 @@ const telegramBot = () => {
         msg.chat.id,
         "Bot çalışıyor! Menu'den yapmak istediğiniz işlemi seçin."
       );
-    } else if (msg.text && msg.text === "/sor") {
-      if (msg.chat.type === "group") {
+    } else if (
+      msg.text &&
+      (msg.text === "/sor" || msg.text == "/sor" + botName)
+    ) {
+      if (msg.chat.type === "supergroup") {
         bot
-          .sendMessage(msg.chat.id, "Bot'a sormak için tıklayın " + botName)
+          .sendMessage(groupId, "Bot'a sormak için tıklayın " + botName)
           .then((sentMessage) => {
             bot.deleteMessage(msg.chat.id, msg.message_id);
             setTimeout(() => {
               bot.deleteMessage(msg.chat.id, sentMessage.message_id);
-            }, 4000);
+            }, 7000);
           });
       } else {
         await bot.sendMessage(
@@ -276,10 +279,10 @@ const telegramBot = () => {
         set(msg.chat.id, "started", true);
         set(msg.chat.id, "step", 1);
       }
-    } else if (!get(msg.chat.id).started && msg.chat.type !== "group") {
+    } else if (!get(msg.chat.id).started && msg.chat.type !== "supergroup") {
       bot.sendMessage(msg.chat.id, "Menu'den bot'u başlatın");
       return;
-    } else if (msg.chat.type !== "group") {
+    } else if (msg.chat.type !== "supergroup") {
       if (!get(msg.chat.id).started) {
         bot.sendMessage(msg.chat.id, "Menu'den bot'u başlatın");
         return;
