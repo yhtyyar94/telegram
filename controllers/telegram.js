@@ -9,6 +9,7 @@ const bot = new TelegramBot(process.env.Telegram, {
 const adminId = process.env.AdminId;
 const groupId = process.env.GroupId;
 const botName = process.env.BotName;
+const database = process.env.Database;
 
 const sendToAdmin = async (msg) => {
   const html =
@@ -151,8 +152,12 @@ const telegramBot = () => {
       query.data;
     if (query.data == "Database'a gönder 💿") {
       bot
-        .sendMessage(adminId, "Database olduğunda inş göndeririz 😀")
+        .sendMessage(adminId, "Uygun ürünler kanalına gönderildi. 🚚")
         .then((data) => {
+          bot.sendPhoto(database, replyImageId, {
+            caption: html,
+            parse_mode: "MarkdownV2",
+          });
           setTimeout(() => {
             bot.deleteMessage(adminId, data.message_id);
           }, 3000);
