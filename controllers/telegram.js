@@ -154,8 +154,10 @@ const telegramBot = () => {
       bot
         .sendMessage(adminId, "Uygun ürünler kanalına gönderildi. 🚚")
         .then((data) => {
+          const dbHtml =
+            "Ürün: " + replyProductName + "\r\nMarket: " + replyMarketName;
           bot.sendPhoto(database, replyImageId, {
-            caption: html,
+            caption: dbHtml,
             parse_mode: "MarkdownV2",
           });
           setTimeout(() => {
