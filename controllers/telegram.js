@@ -11,6 +11,7 @@ const adminId = process.env.AdminId;
 const groupId = process.env.GroupId;
 const botName = process.env.BotName;
 const database = process.env.Database;
+const role = process.env.role;
 
 const sendToAdmin = async (msg) => {
   const product = await get(msg.chat.id);
@@ -294,7 +295,7 @@ const telegramBot = () => {
       msg.text &&
       (msg.text === "/sor" || msg.text == "/sor" + botName)
     ) {
-      if (msg.chat.type === "supergroup") {
+      if (msg.chat.type === role) {
         bot
           .sendMessage(groupId, "Bot'a sormak için tıklayın " + botName)
           .then((sentMessage) => {
@@ -319,13 +320,10 @@ const telegramBot = () => {
         await set(msg.chat.id, "started", true);
         await set(msg.chat.id, "step", 1);
       }
-    } else if (
-      !(await get(msg.chat.id)).started &&
-      msg.chat.type !== "supergroup"
-    ) {
+    } else if (!(await get(msg.chat.id)).started && msg.chat.type !== role) {
       bot.sendMessage(msg.chat.id, "Menu'den bot'u başlatın");
       return;
-    } else if (msg.chat.type !== "supergroup") {
+    } else if (msg.chat.type !== role) {
       if (!(await get(msg.chat.id)).started) {
         bot.sendMessage(msg.chat.id, "Menu'den bot'u başlatın");
         return;
