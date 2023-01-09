@@ -11,6 +11,8 @@ const telegramBot = require("./controllers/telegram");
 
 var app = express();
 
+require("./config/db")();
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
