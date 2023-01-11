@@ -14,9 +14,10 @@ const ProductsSchema = new Schema(
     marketName: { type: String },
     description: { type: String },
     imagesUrls: { type: Array },
-    isCompleted: { type: Boolean },
+    isCompleted: { type: String },
+    isAnswered: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("product", ProductsSchema);
+module.exports = mongoose.model("products", ProductsSchema);

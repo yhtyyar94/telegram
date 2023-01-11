@@ -1,7 +1,15 @@
-const productsSchema = require("../config/productsSchema");
 const ProductsModel = require("../config/productsSchema");
 
-const get = async (chatId, isCompleted = false) => {
+const getById = async (id) => {
+  try {
+    const res = await ProductsModel.findById(id).exec();
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const get = async (chatId, isCompleted = "pending") => {
   try {
     const res = await ProductsModel.findOne({
       chatId: chatId,
@@ -11,7 +19,7 @@ const get = async (chatId, isCompleted = false) => {
       const newProduct = new ProductsModel({
         chatId: chatId,
         userId: chatId,
-        isCompleted: false,
+        isCompleted: "pending",
       });
       const savedProduct = await newProduct.save();
       return savedProduct;
@@ -23,14 +31,24 @@ const get = async (chatId, isCompleted = false) => {
   }
 };
 
+const updateById = async (id, prop, value) => {
+  try {
+    const res = await ProductsModel.findByIdAndUpdate(id, {
+      [prop]: value,
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const set = async (chatId, prop, value) => {
   try {
-    const today = new Date();
     const res = await ProductsModel.findOne({
       chatId: chatId,
-      isCompleted: false,
+      isCompleted: "pending",
     });
-    console.log(res);
+    console.log("findId", res);
     if (res) {
       if (prop == "imagesUrls") {
         const updatedProduct = await ProductsModel.findByIdAndUpdate(res._id, {
@@ -49,12 +67,22 @@ const set = async (chatId, prop, value) => {
   }
 };
 
-const clear = async (chatId) => {
+const del = async (id) => {
+  try {
+    const res = await ProductsModel.findByIdAndDelete(id);
+    return res;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const clear = async (chatId, status) => {
   try {
     const res = await ProductsModel.findOne({
       chatId: chatId,
-      isCompleted: false,
+      isCompleted: status,
     });
+    console.log("clear", res);
     if (!res) return;
     const deleteProduct = await ProductsModel.findByIdAndDelete(res._id);
     console.log("delete", deleteProduct);
@@ -63,4 +91,4 @@ const clear = async (chatId) => {
   }
 };
 
-module.exports = { get, set, clear };
+module.exports = { get, set, clear, getById, del, updateById };
