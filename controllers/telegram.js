@@ -307,7 +307,7 @@ const telegramBot = () => {
         "\nGönderdiğiniz ürünün cevabı:\n" +
         msg.text;
 
-      const product = await getByProductName(db);
+      const product = await getById(db);
 
       if (product == null) {
         bot
