@@ -48,26 +48,24 @@ const isExist = async (query, chatId) => {
       ];
 
       await bot.sendMediaGroup(chatId, mediaGroup);
-      if (i == products.length - 1) {
-        const isExist = [
-          [
-            {
-              text: "Evet 👍",
-              callback_data: "Evet 👍",
-            },
-            {
-              text: "Hayır 👎",
-              callback_data: "Hayır 👎",
-            },
-          ],
-        ];
-        bot.sendMessage(
-          chatId,
-          "Yukarıdakilerden birisi sizin aradığınız ürün mü?",
-          { reply_markup: { inline_keyboard: isExist } }
-        );
-      }
     }
+    const isExist = [
+      [
+        {
+          text: "Evet 👍",
+          callback_data: "Evet 👍",
+        },
+        {
+          text: "Hayır 👎",
+          callback_data: "Hayır 👎",
+        },
+      ],
+    ];
+    bot.sendMessage(
+      chatId,
+      "Yukarıdakilerden birisi sizin aradığınız ürün mü?",
+      { reply_markup: { inline_keyboard: isExist } }
+    );
   } else {
     await set(chatId, "step", 2);
     bot.sendMessage(chatId, "Lütfen ürünün ÖN yüzünün fotoğrafını gönderiniz");
