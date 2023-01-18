@@ -63,7 +63,7 @@ const isExist = async (query, chatId) => {
     ];
     bot.sendMessage(
       chatId,
-      "Yukarıdakilerden birisi sizin aradığınız ürün mü?",
+      "(Eğer ürününüz yukarıdakiler arasında varsa ama cevabı undefined ise ürünü lütfen Halalborder Hollanda kanalında aratın cevabı orada vardır). Yukarıdakilerden birisi sizin aradığınız ürün mü? ",
       { reply_markup: { inline_keyboard: isExist } }
     );
   } else {
