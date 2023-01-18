@@ -17,6 +17,7 @@ const ProductsSchema = new Schema(
     imagesUrls: { type: Array },
     isCompleted: { type: String },
     isAnswered: { type: Boolean, default: false },
+    answer: { type: String },
   },
   { timestamps: true }
 );

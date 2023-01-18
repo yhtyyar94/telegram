@@ -22,6 +22,58 @@ const botName = process.env.BotName;
 const database = process.env.Database;
 const role = process.env.role;
 
+const isExist = async (query, chatId) => {
+  const products = await ProductsModel.find({
+    productName: { $regex: query, $options: "i" },
+  });
+  if (products.length > 0) {
+    for (let i = 0; i < products.length; i++) {
+      const html =
+        "Ürün: " +
+        products[i].productName +
+        "\r\nMarket: " +
+        products[i].marketName +
+        "\nGönderdiğiniz ürünün cevabı: \n" +
+        products[i].answer;
+
+      const mediaGroup = [
+        { type: "photo", media: products[i].ingredients },
+        { type: "photo", media: products[i].frontImage },
+        {
+          type: "photo",
+          media: products[i].barcode,
+          caption: html,
+          parse_mode: "MarkdownV2",
+        },
+      ];
+
+      await bot.sendMediaGroup(chatId, mediaGroup);
+      if (i == products.length - 1) {
+        const isExist = [
+          [
+            {
+              text: "Evet 👍",
+              callback_data: "Evet 👍",
+            },
+            {
+              text: "Hayır 👎",
+              callback_data: "Hayır 👎",
+            },
+          ],
+        ];
+        bot.sendMessage(
+          chatId,
+          "Yukarıdakilerden birisi sizin aradığınız ürün mü?",
+          { reply_markup: { inline_keyboard: isExist } }
+        );
+      }
+    }
+  } else {
+    await set(chatId, "step", 2);
+    bot.sendMessage(chatId, "Lütfen ürünün ÖN yüzünün fotoğrafını gönderiniz");
+  }
+};
+
 const sendToAdmin = async (id) => {
   const product = await getById(id);
   const html =
@@ -162,6 +214,26 @@ const telegramBot = () => {
       bot.deleteMessage(adminId, query.message.message_id - 3);
       return;
     }
+
+    if (query.data == "Evet 👍") {
+      await clear(query.message.chat.id, "pending");
+      bot.sendMessage(
+        query.message.chat.id,
+        "Yeni bir sorgu için menü'den bot'u başlatın"
+      );
+      return;
+    }
+
+    if (query.data == "Hayır 👎") {
+      await set(query.message.chat.id, "step", 2);
+      bot.sendMessage(
+        query.message.chat.id,
+        "Lütfen ürünün ÖN yüzünün fotoğrafını gönderiniz"
+      );
+
+      return;
+    }
+
     const replyUserId = query.message.text.slice(
       query.message.text.indexOf("Kullanıcı ID: ") + 14,
       query.message.text.indexOf("Kullanıcı ID: ") + 25
@@ -248,6 +320,7 @@ const telegramBot = () => {
         { chat_id: adminId, message_id: query.message.message_id }
       );
       await updateById(db, "isAnswered", true);
+      await updateById(db, "answer", query.data);
     }
     return;
   });
@@ -282,7 +355,7 @@ const telegramBot = () => {
       }
     }
 
-    if (msg.reply_to_message && msg.chat.id == adminId) {
+    if (msg.reply_to_message && msg.chat.id == adminId && !msg.media_group_id) {
       const replyChatId = msg.reply_to_message.text.slice(
         msg.reply_to_message.text.indexOf("Chat ID: ") + 9,
         msg.reply_to_message.text.indexOf("Chat ID: ") + 25
@@ -352,6 +425,7 @@ const telegramBot = () => {
         { chat_id: adminId, message_id: msg.reply_to_message.message_id }
       );
       await updateById(db, "isAnswered", true);
+      await updateById(db, "answer", msg.reply_to_message.text);
 
       setTimeout(() => {
         bot.deleteMessage(adminId, msg.message_id);
@@ -416,12 +490,8 @@ const telegramBot = () => {
             );
             return;
           } else {
+            await isExist(msg.text, msg.chat.id);
             await set(msg.chat.id, "productName", msg.text);
-            await set(msg.chat.id, "step", 2);
-            bot.sendMessage(
-              msg.chat.id,
-              "Lütfen ürünün ÖN yüzünün fotoğrafını gönderiniz"
-            );
           }
           break;
         case 2:
