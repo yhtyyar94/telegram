@@ -1,17 +1,6 @@
 require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
-const mergeImages = require("./jimp");
-const fs = require("fs");
-const {
-  get,
-  set,
-  clear,
-  getByProductName,
-  del,
-  updateById,
-  getById,
-} = require("./mutations");
-const path = require("path");
+const { get, set, clear, updateById, getById } = require("./mutations");
 const ProductsModel = require("../config/productsSchema");
 const bot = new TelegramBot(process.env.Telegram, {
   polling: true,
@@ -22,6 +11,39 @@ const botName = process.env.BotName;
 const database = process.env.Database;
 const role = process.env.role;
 
+const putBackSlash = (text) => {
+  const symbols = [
+    "_",
+    "*",
+    "[",
+    "]",
+    "(",
+    ")",
+    "~",
+    "`",
+    ">",
+    "#",
+    "+",
+    "-",
+    "=",
+    "|",
+    "{",
+    "}",
+    ".",
+    "!",
+  ];
+  let result = "";
+  for (let i = 0; i < text.length; i++) {
+    if (symbols.indexOf(text[i]) == -1) {
+      result += text[i];
+    } else {
+      result += "\\" + text[i];
+    }
+  }
+
+  return result;
+};
+
 const isExist = async (query, chatId) => {
   const products = await ProductsModel.find({
     productName: { $regex: query, $options: "i" },
@@ -30,11 +52,11 @@ const isExist = async (query, chatId) => {
     for (let i = 0; i < products.length; i++) {
       const html =
         "Ürün: " +
-        products[i].productName +
+        putBackSlash(products[i].productName) +
         "\r\nMarket: " +
-        products[i].marketName +
+        putBackSlash(products[i].marketName) +
         "\nGönderdiğiniz ürünün cevabı: \n" +
-        products[i].answer;
+        putBackSlash(products[i].answer);
 
       const mediaGroup = [
         { type: "photo", media: products[i].ingredients },
@@ -76,11 +98,11 @@ const sendToAdmin = async (id) => {
   const product = await getById(id);
   const html =
     "Ürün: " +
-    product.productName +
+    putBackSlash(product.productName) +
     "\nMarket: " +
-    product.marketName +
+    putBackSlash(product.marketName) +
     "\nAçıklama: " +
-    product.description +
+    putBackSlash(product.description) +
     "\nChat ID: " +
     product.chatId +
     "\n[Kullanıcıya mesaj gönder](tg://user?id=" +
@@ -232,11 +254,6 @@ const telegramBot = () => {
       return;
     }
 
-    const replyUserId = query.message.text.slice(
-      query.message.text.indexOf("Kullanıcı ID: ") + 14,
-      query.message.text.indexOf("Kullanıcı ID: ") + 25
-    );
-
     const replyChatId = query.message.text.slice(
       query.message.text.indexOf("Chat ID: ") + 9,
       query.message.text.indexOf("Chat ID: ") + 25
@@ -257,9 +274,9 @@ const telegramBot = () => {
     console.log("db", db);
     const html =
       "Ürün: " +
-      replyProductName +
+      putBackSlash(replyProductName) +
       "\r\nMarket: " +
-      replyMarketName +
+      putBackSlash(replyMarketName) +
       "\nGönderdiğiniz ürünün cevabı: \n" +
       query.data;
 
@@ -284,7 +301,10 @@ const telegramBot = () => {
         .sendMessage(adminId, "Uygun ürünler kanalına gönderildi. 🚚")
         .then((data) => {
           const html =
-            "Ürün: " + replyProductName + "\r\nMarket: " + replyMarketName;
+            "Ürün: " +
+            putBackSlash(replyProductName) +
+            "\r\nMarket: " +
+            putBackSlash(replyMarketName);
           const mediaGroup = [
             { type: "photo", media: product.ingredients },
             { type: "photo", media: product.frontImage },
@@ -372,11 +392,11 @@ const telegramBot = () => {
       );
       const html =
         "Ürün: " +
-        replyProductName +
+        putBackSlash(replyProductName) +
         "\n Market: " +
-        replyMarketName +
+        putBackSlash(replyMarketName) +
         "\nGönderdiğiniz ürünün cevabı:\n" +
-        msg.text;
+        putBackSlash(msg.text);
 
       const product = await getById(db);
 
