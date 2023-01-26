@@ -47,6 +47,7 @@ const putBackSlash = (text) => {
 const isExist = async (query, chatId) => {
   const products = await ProductsModel.find({
     productName: { $regex: query, $options: "i" },
+    isAnswered: true,
   });
   if (products.length > 0) {
     for (let i = 0; i < products.length; i++) {
@@ -396,7 +397,7 @@ const telegramBot = () => {
         "\n Market: " +
         putBackSlash(replyMarketName) +
         "\nGönderdiğiniz ürünün cevabı:\n" +
-        putBackSlash(msg.text);
+        msg.text;
 
       const product = await getById(db);
 
