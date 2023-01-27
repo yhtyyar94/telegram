@@ -217,6 +217,8 @@ const sendPendingProducts = async () => {
 };
 
 const telegramBot = () => {
+  let stop = false;
+  let days = 0;
   const commands = [
     {
       command: "/sor",
@@ -348,6 +350,19 @@ const telegramBot = () => {
   let timeOut;
   bot.on("message", async (msg) => {
     console.log(msg);
+    if (msg.text == "/stop" && msg.chat.id == adminId) {
+      stop = true;
+    }
+    if (msg.text == "/start" && msg.chat.id == adminId) {
+      stop = false;
+    }
+    if (stop == true && msg.chat.id != adminId) {
+      bot.sendMessage(
+        msg.chat.id,
+        "Malesef admin birkaç gün müsait değil. O yüzden istek alamıyorum. Son güncellemeleri Halal Border kanalından takip edebilirsiniz. Anlayışınız için teşekkürler🙏"
+      );
+      return;
+    }
     const product = await get(msg.chat.id);
 
     // set rest time
@@ -632,4 +647,4 @@ const telegramBot = () => {
   });
 };
 
-module.exports = telegramBot;
+module.exports = { telegramBot, bot };
