@@ -49,15 +49,17 @@ const isExist = async (query, chatId) => {
     productName: { $regex: query, $options: "i" },
     isAnswered: true,
   });
+  console.log(products);
   if (products.length > 0) {
     for (let i = 0; i < products.length; i++) {
+      const productAnswer = products[i].answer ? products[i].answer : "";
       const html =
         "Ürün: " +
         putBackSlash(products[i].productName) +
         "\r\nMarket: " +
         putBackSlash(products[i].marketName) +
         "\nGönderdiğiniz ürünün cevabı: \n" +
-        putBackSlash(products[i].answer);
+        productAnswer;
 
       const mediaGroup = [
         { type: "photo", media: products[i].ingredients },
@@ -70,7 +72,17 @@ const isExist = async (query, chatId) => {
         },
       ];
 
-      await bot.sendMediaGroup(chatId, mediaGroup);
+      bot
+        .getFile(products[i].frontImage)
+        .then(async (data) => {
+          await bot.sendMediaGroup(chatId, mediaGroup);
+        })
+        .catch(async (err) => {
+          console.log("err", err);
+          if (err) {
+            await ProductsModel.findByIdAndDelete(products[i]._id);
+          }
+        });
     }
     const isExist = [
       [
@@ -647,4 +659,4 @@ const telegramBot = () => {
   });
 };
 
-module.exports = { telegramBot, bot };
+module.exports = telegramBot;
