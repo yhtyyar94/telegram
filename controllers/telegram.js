@@ -72,7 +72,7 @@ const isExist = async (query, chatId) => {
         },
       ];
 
-      bot
+      await bot
         .getFile(products[i].frontImage)
         .then(async (data) => {
           await bot.sendMediaGroup(chatId, mediaGroup);
@@ -96,7 +96,7 @@ const isExist = async (query, chatId) => {
         },
       ],
     ];
-    bot.sendMessage(
+    await bot.sendMessage(
       chatId,
       "(Eğer ürününüz yukarıdakiler arasında varsa ama cevabı undefined ise ürünü lütfen Halalborder Hollanda kanalında aratın cevabı orada vardır). Yukarıdakilerden birisi sizin aradığınız ürün mü? ",
       { reply_markup: { inline_keyboard: isExist } }
