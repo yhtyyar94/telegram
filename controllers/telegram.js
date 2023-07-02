@@ -368,7 +368,7 @@ const telegramBot = () => {
     if (msg.text == "/start" && msg.chat.id == adminId) {
       stop = false;
     }
-    if (stop == true && msg.chat.id != adminId) {
+    if (stop == true && msg.chat.id != adminId && msg.chat.id != groupId) {
       bot.sendMessage(
         msg.chat.id,
         "Malesef admin birkaç gün müsait değil. O yüzden istek alamıyorum. Son güncellemeleri Halal Border kanalından takip edebilirsiniz. Anlayışınız için teşekkürler🙏"
