@@ -300,6 +300,11 @@ const telegramBot = () => {
     const product = await getById(db);
     console.log("product in query", product);
 
+    const pendingProductsCount = await ProductsModel.find({
+      isAnswered: false,
+      isCompleted: "true",
+    }).countDocuments();
+
     const mediaGroup = [
       { type: "photo", media: product.ingredients },
       { type: "photo", media: product.frontImage },
@@ -307,6 +312,30 @@ const telegramBot = () => {
         type: "photo",
         media: product.barcode,
         caption: html,
+        parse_mode: "MarkdownV2",
+      },
+    ];
+
+    const htmlForGroup =
+      "Ürün: " +
+      putBackSlash(replyProductName) +
+      "\r\nMarket: " +
+      putBackSlash(replyMarketName) +
+      "\nGönderdiğiniz ürünün cevabı: \n" +
+      query.data +
+      "\r\n" +
+      "Cevaplanmayı bekleyen ürün sayısı: " +
+      "**" +
+      pendingProductsCount +
+      "**";
+
+    const mediaGroupForGroup = [
+      { type: "photo", media: product.ingredients },
+      { type: "photo", media: product.frontImage },
+      {
+        type: "photo",
+        media: product.barcode,
+        caption: htmlForGroup,
         parse_mode: "MarkdownV2",
       },
     ];
@@ -337,7 +366,7 @@ const telegramBot = () => {
         });
     } else if (query.data != "Ürünü sil 🗑️") {
       bot.sendMediaGroup(replyChatId, mediaGroup);
-      bot.sendMediaGroup(groupId, mediaGroup);
+      bot.sendMediaGroup(groupId, mediaGroupForGroup);
       bot.editMessageReplyMarkup(
         {
           inline_keyboard: [
