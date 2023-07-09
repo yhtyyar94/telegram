@@ -325,9 +325,8 @@ const telegramBot = () => {
       query.data +
       "\r\n" +
       "Cevaplanmayı bekleyen ürün sayısı: " +
-      "**" +
-      pendingProductsCount +
-      "**";
+    pendingProductsCount
+    
 
     const mediaGroupForGroup = [
       { type: "photo", media: product.ingredients },
