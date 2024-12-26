@@ -11,6 +11,14 @@ const botName = process.env.BotName;
 const database = process.env.Database;
 const role = process.env.role;
 
+bot.on('polling_error', (error) => {
+	var time = new Date();
+	console.log("TIME:", time);
+	console.log("CODE:", error.code);  
+	console.log("MSG:", error.message);
+	console.log("STACK:", error.stack);
+});
+
 const putBackSlash = (text) => {
   const symbols = [
     "_",
