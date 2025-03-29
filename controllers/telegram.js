@@ -2,6 +2,7 @@ require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
 const { get, set, clear, updateById, getById } = require("./mutations");
 const ProductsModel = require("../config/productsSchema");
+const AdminModel = require("../config/userSchema");
 const bot = new TelegramBot(process.env.Telegram, {
   polling: true,
 });
@@ -12,11 +13,11 @@ const database = process.env.Database;
 const role = process.env.role;
 
 bot.on('polling_error', (error) => {
-	var time = new Date();
-	console.log("TIME:", time);
-	console.log("CODE:", error.code);  
-	console.log("MSG:", error.message);
-	console.log("STACK:", error.stack);
+  var time = new Date();
+  console.log("TIME:", time);
+  console.log("CODE:", error.code);
+  console.log("MSG:", error.message);
+  console.log("STACK:", error.stack);
 });
 
 const putBackSlash = (text) => {
@@ -106,7 +107,7 @@ const isExist = async (query, chatId) => {
     ];
     await bot.sendMessage(
       chatId,
-      "(Eğer ürününüz yukarıdakiler arasında varsa ama cevabı undefined ise ürünü lütfen Halalborder Hollanda kanalında aratın cevabı orada vardır). Yukarıdakilerden birisi sizin aradığınız ürün mü? ",
+      "(Eğer ürününüz yukarıdakiler arasında varsa ama cevabı undefined ise ürünü lütfen Halalborder İsviçre kanalında aratın cevabı orada vardır). Yukarıdakilerden birisi sizin aradığınız ürün mü? ",
       { reply_markup: { inline_keyboard: isExist } }
     );
   } else {
@@ -163,8 +164,8 @@ const sendToAdmin = async (id) => {
 
     [
       {
-        text: "Ürün vegatarish mi ve aromalar sorulmalı ❓",
-        callback_data: "Ürün vegatarish mi ve aromalar sorulmalı ❓",
+        text: "Ürün vegatarish mi ve aromalar/extractler sorulmalı ❓",
+        callback_data: "Ürün vegatarish mi ve aromalar/extractler sorulmalı ❓",
       },
     ],
 
@@ -333,8 +334,8 @@ const telegramBot = () => {
       query.data +
       "\r\n" +
       "Cevaplanmayı bekleyen ürün sayısı: " +
-    pendingProductsCount
-    
+      pendingProductsCount
+
 
     const mediaGroupForGroup = [
       { type: "photo", media: product.ingredients },
@@ -371,12 +372,38 @@ const telegramBot = () => {
             bot.deleteMessage(adminId, data.message_id);
           }, 3000);
         });
+    } else if (query.data == "productAnsweredBy") {
+
     } else if (query.data != "Ürünü sil 🗑️") {
+      console.log("admin", query);
       bot.sendMediaGroup(replyChatId, mediaGroup);
       bot.sendMediaGroup(groupId, mediaGroupForGroup);
+      const productAnsweredBy = `Cevaplayan: ${query.from.first_name ? query.from.first_name : ""} ${query.from.last_name ? query.from.last_name : ""}`
+      const fetchAdmin = await AdminModel.findOne({ chatId: query.from.id });
+      if (fetchAdmin) {
+        const updatedData = await AdminModel.findByIdAndUpdate(fetchAdmin._id, {
+          answered_product_count: fetchAdmin.answered_product_count + 1,
+        });
+        console.log("data", updatedData);
+      } else {
+        const admin = new AdminModel({
+          firstname: query.from.first_name,
+          lastname: query.from.last_name,
+          username: query.from.username,
+          chatId: query.from.id,
+          answered_product_count: 1,
+        });
+        const savedData = await admin.save();
+        console.log("data", savedData);
+      }
+      const count = `Toplam Cevap: ${fetchAdmin.answered_product_count + 1}`
+      const answer = `Cevap: ${query.data}`;
       bot.editMessageReplyMarkup(
         {
           inline_keyboard: [
+            [{ text: answer, callback_data: "productAnsweredBy" }],
+            [{ text: productAnsweredBy, callback_data: "productAnsweredBy" }],
+            [{ text: count, callback_data: "productAnsweredBy" }],
             [{ text: "Ürünü sil 🗑️", callback_data: "Ürünü sil 🗑️" }],
             [
               {
@@ -436,7 +463,7 @@ const telegramBot = () => {
         await sendPendingProducts();
       }
     }
-
+    // reply to product manually
     if (msg.reply_to_message && msg.chat.id == adminId && !msg.media_group_id) {
       const replyChatId = msg.reply_to_message.text.slice(
         msg.reply_to_message.text.indexOf("Chat ID: ") + 9,
