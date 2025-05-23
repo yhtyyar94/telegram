@@ -132,66 +132,79 @@ const sendToAdmin = async (id) => {
     ")" +
     "\nDB:" +
     product._id;
-  const buttons = [
-    [
-      {
-        text: "Uygun ✅",
-        callback_data: "Uygun ✅",
-      },
-      {
-        text: "Şüpheli ⁉️",
-        callback_data: "Şüpheli ⁉️",
-      },
-    ],
-    [
-      {
-        text: "Aroma sorulmalı ❓",
-        callback_data: "Aroma sorulmalı ❓",
-      },
-    ],
-    [
-      {
-        text: "Extract sorulmalı ❓",
-        callback_data: "Extract sorulmalı ❓",
-      },
-    ],
-    [
-      {
-        text: "Ürün vegatarish mi sorulmalı ❓",
-        callback_data: "Ürün vegatarish mi sorulmalı ❓",
-      },
-    ],
-
-    [
-      {
-        text: "Ürün vegatarish mi ve aromalar/extractler sorulmalı ❓",
-        callback_data: "Ürün vegatarish mi ve aromalar/extractler sorulmalı ❓",
-      },
-    ],
-
-    [
-      {
-        text: "Cevap sabit mesajlarda ⬆️",
-        callback_data: "Cevap sabit mesajlarda ⬆️",
-      },
-    ],
-    [
-      {
-        text: "Uygun Değil 🚫",
-        callback_data: "Uygun Değil 🚫",
-      },
-      {
-        text: "Haram ⛔️",
-        callback_data: "Haram ⛔️",
-      },
-    ],
-    [
-      {
-        text: "Ürünü sil 🗑️",
-        callback_data: "Ürünü sil 🗑️",
-      },
-    ],
-  ];
+    const buttons = [
+      [
+        {
+          text: "Uygun ✅",
+          callback_data: "Uygun ✅",
+        },
+        {
+          text: "Şüpheli ⁉️",
+          callback_data: "Şüpheli ⁉️",
+        },
+      ],
+      [
+        {
+          text: "Aroma sorulmalı ❓",
+          callback_data: "Aroma sorulmalı ❓",
+        },
+      ],
+      [
+        {
+          text: "Extract sorulmalı ❓",
+          callback_data: "Extract sorulmalı ❓",
+        },
+      ],
+      [
+        {
+          text: "Ürün vegatarish mi sorulmalı ❓",
+          callback_data: "Ürün vegatarish mi sorulmalı ❓",
+        },
+      ],
+  
+      [
+        {
+          text: "Ürün vegatarish mi ve aromalar sorulmalı ❓",
+          callback_data: "Ürün vegatarish mi ve aromalar sorulmalı ❓",
+        },
+      ],
+      [
+        {
+          text: "Ürün vegatarish mi ve extractler sorulmalı ❓",
+          callback_data: "Ürün vegatarish mi ve extractler sorulmalı ❓",
+        },
+      ],
+  
+      [
+        {
+          text: "Aroma ve extract sorulmalı ❓",
+          callback_data: "Aroma ve extract sorulmalı ❓",
+        },
+      ],
+  
+      [
+        {
+          text: "Cevap sabit mesajlarda ⬆️",
+          callback_data: "Cevap sabit mesajlarda ⬆️",
+        },
+      ],
+      [
+        {
+          text: "Uygun Değil 🚫",
+          callback_data: "Uygun Değil 🚫",
+        },
+        {
+          text: "Haram ⛔️",
+          callback_data: "Haram ⛔️",
+        },
+      ],
+      [
+        {
+          text: "Ürünü sil 🗑️",
+          callback_data: "Ürünü sil 🗑️",
+        },
+      ],
+    ];
 
   bot
     .sendMediaGroup(adminId, [
