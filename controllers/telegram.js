@@ -574,7 +574,7 @@ const telegramBot = () => {
             bot.deleteMessage(msg.chat.id, msg.message_id);
             setTimeout(() => {
               bot.deleteMessage(msg.chat.id, sentMessage.message_id);
-            }, 7000);
+            }, 3000);
           });
       } else {
         await bot.sendMessage(
