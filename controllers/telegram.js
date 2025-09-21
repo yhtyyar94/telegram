@@ -3,6 +3,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const { get, set, clear, updateById, getById } = require("./mutations");
 const ProductsModel = require("../config/productsSchema");
 const AdminModel = require("../config/userSchema");
+const { getAllAnsweredProducts } = require("./upload_archive");
 const bot = new TelegramBot(process.env.Telegram, {
   polling: true,
 });
@@ -476,6 +477,57 @@ const telegramBot = () => {
         await sendPendingProducts();
       }
     }
+
+        // send answered products to channel
+        if (
+          msg.chat.type == role &&
+          msg.chat.id == adminId &&
+          msg.text.includes("/gonder")
+        ) {
+          const answeredProducts = await getAllAnsweredProducts();
+          if (answeredProducts.length > 0) {
+            for (let i = 0; i < answeredProducts.length; i++) {
+              const html =
+                "Ürün: " +
+                putBackSlash(answeredProducts[i].productName || "") +
+                "\r\nMarket: " +
+                putBackSlash(answeredProducts[i].marketName || "") +
+                "\nCevap: " +
+                putBackSlash(answeredProducts[i].answer || "Cevap bulunamadı");
+    
+              const mediaGroup = [
+                { type: "photo", media: answeredProducts[i].ingredients },
+                { type: "photo", media: answeredProducts[i].frontImage },
+                {
+                  type: "photo",
+                  media: answeredProducts[i].barcode,
+                  caption: html,
+                  parse_mode: "MarkdownV2",
+                },
+              ];
+    
+    
+              try {
+                await bot.sendMediaGroup(groupId, mediaGroup)
+              }
+              catch (err) {
+                console.log("Error sending media group:", err);
+                continue;
+    
+              }
+            }
+    
+            bot.sendMessage(adminId, "Cevaplanan ürünler kanala gönderildi.").catch((err) => {
+              console.log("Error sending message:", err);
+            });
+          } else {
+            bot.sendMessage(adminId, "Cevaplanan ürün bulunamadı.").catch((err) => {
+              console.log("Error sending message:", err);
+            });
+          }
+          return;
+        }
+
     // reply to product manually
     if (msg.reply_to_message && msg.chat.id == adminId && !msg.media_group_id) {
       const replyChatId = msg.reply_to_message.text.slice(
