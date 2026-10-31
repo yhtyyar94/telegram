@@ -14,7 +14,7 @@ const adminSchema = new Schema(
 );
 
 module.exports = mongoose.model(
-    "nladmins",
+    "admins",
     adminSchema,
     process.env.collection
 );

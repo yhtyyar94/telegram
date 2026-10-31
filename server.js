@@ -8,6 +8,7 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const telegramBot = require("./controllers/telegram");
+const { getAllAnsweredProducts, sendAnsweredProductsToChannel } = require("./controllers/upload_archive");
 
 var app = express();
 
