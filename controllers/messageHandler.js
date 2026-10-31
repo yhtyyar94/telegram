@@ -156,12 +156,15 @@ const handleAdminReply = async (msg) => {
 const handleSorCommand = async (msg) => {
     if (msg.chat.type === env.role) {
         bot
-            .sendMessage(env.groupId, "Bot'a sormak için tıklayın " + env.botName)
+            .sendMessage(msg.chat.id, "Bot'a sormak için tıklayın " + env.botName)
             .then((sentMessage) => {
                 safe(bot.deleteMessage(msg.chat.id, msg.message_id), "del /sor");
                 setTimeout(() => {
                     safe(
-                        bot.deleteMessage(msg.chat.id, sentMessage.message_id),
+                        bot.deleteMessage(
+                            sentMessage.chat.id,
+                            sentMessage.message_id
+                        ),
                         "del /sor hint"
                     );
                 }, 3000);
